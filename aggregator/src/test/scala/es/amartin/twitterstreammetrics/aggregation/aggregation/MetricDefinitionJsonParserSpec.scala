@@ -6,6 +6,9 @@ class MetricDefinitionJsonParserSpec extends FunSpec with Matchers {
 
   private def fixture = new {
     val jsonText = """{"key1":"value1", "key2": {"nestedKey2": "value2"}}"""
+    val jsonTextWithHashtags =
+      """{"key1":"value1", "key2": {"nestedKey2": "value2"},
+        |"entities":{"hashtags":[{"text":"hashtag"}]}}""".stripMargin
     val metricDefinitionWithIfHasTrue: String =
       """{
         |"name":"name",
@@ -39,6 +42,13 @@ class MetricDefinitionJsonParserSpec extends FunSpec with Matchers {
         |"name":"name",
         |"groupBy":["groupBy","andBy"],
         |"textFilters":{"key1":["value1"]}
+        |}""".stripMargin
+    val metricDefinitionWithHashtags: String =
+      """{
+        |"name":"name",
+        |"groupBy":["groupBy","andBy"],
+        |"textFilters":{"key1":["value1"]},
+        |"hashtags":["hashtag"]
         |}""".stripMargin
     val unit = new MetricDefinitionJsonParser
   }
@@ -83,6 +93,22 @@ class MetricDefinitionJsonParserSpec extends FunSpec with Matchers {
       val result = f.unit.parse(f.metricDefinitionWithoutAny)
 
       result.filter(JsonUtils.toJsonNode(f.jsonText)) shouldBe true
+    }
+
+    it("should parse and configure proper filter for definition with hashtags and true result") {
+      val f = fixture
+
+      val result = f.unit.parse(f.metricDefinitionWithHashtags)
+
+      result.filter(JsonUtils.toJsonNode(f.jsonTextWithHashtags)) shouldBe true
+    }
+
+    it("should parse and configure proper filter for definition with hashtags and false result") {
+      val f = fixture
+
+      val result = f.unit.parse(f.metricDefinitionWithHashtags)
+
+      result.filter(JsonUtils.toJsonNode(f.jsonText)) shouldBe false
     }
   }
 

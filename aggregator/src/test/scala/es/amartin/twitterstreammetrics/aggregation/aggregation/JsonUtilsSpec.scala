@@ -22,7 +22,8 @@ class JsonUtilsSpec extends FunSpec with Matchers {
       groupBy = Array("groupBy", "andBy"),
       textFilters = Map("text" -> Array("filterThis", "andAlsoThis")),
       ifHas = null,
-      ifHasNot = null)
+      ifHasNot = null,
+      hashtags = null)
   }
 
   describe("A JsonUtil") {

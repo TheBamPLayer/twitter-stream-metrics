@@ -31,9 +31,10 @@ object PredefinedMetricDefinitions {
     pathsGroupBy: Set[String] = Set(),
     textFilters: JsonTextFilter = Map(),
     ifHas: Option[String] = None,
-    ifHasNot: Option[String] = None): MetricDefinition =
+    ifHasNot: Option[String] = None,
+    hashtags: Option[Set[String]] = None): MetricDefinition =
     MetricDefinition(
-      filter = toJsonFilter(textFilters, ifHas, ifHasNot),
+      filter = toJsonFilter(textFilters, ifHas, ifHasNot, hashtags),
       aggregationFunction = "count",
       fieldExtractor = node => pathsGroupBy.map(path => path -> correctEmpty(JsonUtils.fromPath(node, path).asText))
         .toMap,
@@ -41,7 +42,11 @@ object PredefinedMetricDefinitions {
       name = name
     )
 
-  private def toJsonFilter(filterWords: JsonTextFilter, ifHas: Option[String], ifHasNot: Option[String]): JsonFilter = {
+  private def toJsonFilter(
+    filterWords: JsonTextFilter,
+    ifHas: Option[String],
+    ifHasNot: Option[String],
+    hashtags: Option[Set[String]]): JsonFilter = {
     node =>
       ifHas.forall(key => !JsonUtils.fromPath(node, key).isMissingNode) &&
         ifHasNot.forall(key => JsonUtils.fromPath(node, key).isMissingNode) &&
@@ -49,7 +54,39 @@ object PredefinedMetricDefinitions {
           (filterWords forall { tuple =>
             val (path, words) = tuple
             words.exists(JsonUtils.fromPath(node, path).asText().toLowerCase().contains)
-          }))
+          })) &&
+        applyHashtagFilter(node, hashtags)
+
+  }
+
+  private def applyHashtagFilter(node: JsonNode, hashtagsStrings: Option[Set[String]]): Boolean =
+    hashtagsStrings match {
+      case None => return true
+      case Some(hashtagList) =>
+        val hashtags = JsonUtils.fromPath(node, "entities.hashtags")
+        if (!hashtags.isNull && hashtags.isArray) {
+          var found = false
+          val iterator = hashtags.iterator
+          while (iterator.hasNext && !found) {
+            val hashtagObject = iterator.next
+            found = contains(hashtagObject, hashtagList)
+          }
+          return found
+        } else {
+          return false
+        }
+
+    }
+
+  private def contains(node: JsonNode, hashtags: Set[String]): Boolean = {
+    val path: String = "text"
+    val obj: String = JsonUtils.fromPath(node, path).asText()
+    for (hashtag <- hashtags) {
+      if (hashtag.equals(obj)) {
+        return true
+      }
+    }
+    return false
   }
 
 }

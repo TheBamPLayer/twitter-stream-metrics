@@ -1,8 +1,6 @@
 {
-  "textFilters": {
-    "text":["hola"]
-  },
-  "name":"hola",
-  "groupBy":["user.time_zone"],
+  "textFilters": {},
+  "groupBy":["place.country_code"],
+  "name":"testlocation2",
   "ifHasNot": "delete"
 }

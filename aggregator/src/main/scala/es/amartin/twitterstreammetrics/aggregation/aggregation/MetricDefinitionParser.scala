@@ -18,7 +18,8 @@ class MetricDefinitionJsonParser extends MetricDefinitionParser {
       pathsGroupBy = jsonMetricDefinition.groupBy.toSet,
       textFilters = jsonTextFilter.toMap,
       ifHas = Option(jsonMetricDefinition.ifHas),
-      ifHasNot = Option(jsonMetricDefinition.ifHasNot))
+      ifHasNot = Option(jsonMetricDefinition.ifHasNot),
+      hashtags = Option(jsonMetricDefinition.hashtags).map(_.toSet))
   }
 }
 
@@ -28,4 +29,5 @@ case class JsonMetricDefinition(
   @JsonProperty("groupBy") groupBy: Array[String],
   @JsonProperty("ifHas") ifHas: String,
   @JsonProperty("ifHasNot") ifHasNot: String,
-  @JsonProperty("textFilters") textFilters: java.util.Map[String, Array[String]])
+  @JsonProperty("textFilters") textFilters: java.util.Map[String, Array[String]],
+  @JsonProperty("hashtags") hashtags: Array[String])

@@ -1,0 +1,7 @@
+{
+  "textFilters": {},
+  "groupBy":["user.time_zone"],
+  "name":"weirdArabicHashTag",
+  "ifHasNot": "delete",
+  "hashtags": ["الشعب_اشتاق_لك_يامحمد"]
+}
